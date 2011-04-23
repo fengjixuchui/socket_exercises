@@ -92,10 +92,9 @@ int main(int argc, char **argv) {
                     pollfds[i].fd, i);
                 close(pollfds[i].fd);
                 pollfds[i].fd = -1;
-                pollfds[i].events = 0;
                 pollfds[i].revents = 0;
               }
-              if (pollfds[i].revents & POLLIN) { /* some data arrived, echo it */
+              else if (pollfds[i].revents & POLLIN) { /* some data arrived, echo it */
                 bzero(buf, sizeof(buf));
                 recv(pollfds[i].fd, buf, sizeof(buf), 0);
                 send(pollfds[i].fd, buf, strlen(buf), 0);
