@@ -1,0 +1,4 @@
+A collection of basic socket exercises
+
+usage:
+echoserver-* <port>
