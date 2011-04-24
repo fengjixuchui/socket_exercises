@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
   socklen_t addr_size;
   char *listenport;
   int listenfd;
-  int yes, err, freefds, sflags;
+  int yes, err, sflags;
   char buf[BUFLEN];
   struct pollfd pollfds[MAX_CONNECTIONS];
   int x, i; /* counters etc */
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
   pollfds[0].fd = listenfd;
 
   while(1) {
-    if ((freefds = poll(pollfds, MAX_CONNECTIONS, -1))) {
+    if (poll(pollfds, MAX_CONNECTIONS, -1)) {
       for (i = 0; i < MAX_CONNECTIONS; i++)  {
         if (pollfds[i].revents)  { /* if an event happened */
           if (i == 0) { /* If it is our listener socket */
