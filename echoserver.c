@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
   addr_size = sizeof(their_addr);
   connfd = accept(listenfd, (struct sockaddr*)&their_addr, &addr_size);
   while ((bytes = recv(connfd, buf, sizeof(buf), 0)))  {
+      buf[bytes] = 0;
       send(connfd, buf, strlen(buf), 0);
   }
 
