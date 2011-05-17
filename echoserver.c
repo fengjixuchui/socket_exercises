@@ -8,6 +8,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
+#include "sendall.h"
+
 #define BACKLOG 10
 
 int main(int argc, char **argv) {
@@ -38,7 +40,7 @@ int main(int argc, char **argv) {
   connfd = accept(listenfd, (struct sockaddr*)&their_addr, &addr_size);
   while ((bytes = recv(connfd, buf, sizeof(buf), 0)))  {
       buf[bytes] = 0;
-      send(connfd, buf, strlen(buf), 0);
+      sendall(connfd, buf, strlen(buf), 0);
   }
 
   freeaddrinfo(res);

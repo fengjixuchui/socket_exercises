@@ -10,6 +10,8 @@
 #include <poll.h>
 #include <fcntl.h>
 
+#include "sendall.h"
+
 #define MAX_CONNECTIONS 20
 #define BUFLEN 1024
 
@@ -29,6 +31,7 @@ int main(int argc, char **argv) {
   char buf[BUFLEN];
   struct pollfd pollfds[MAX_CONNECTIONS];
   int x, i; /* counters etc */
+  int bytes; /* number of bytes sent */
 
   listenport = argv[1];
 
@@ -95,9 +98,9 @@ int main(int argc, char **argv) {
               pollfds[i].revents = 0;
             }
             else if (pollfds[i].revents & POLLIN) { /* some data arrived, echo it */
-              bzero(buf, sizeof(buf));
-              recv(pollfds[i].fd, buf, sizeof(buf), 0);
-              send(pollfds[i].fd, buf, strlen(buf), 0);
+              bytes = recv(pollfds[i].fd, buf, sizeof(buf), 0);
+              buf[bytes] = 0;
+              sendall(pollfds[i].fd, buf, strlen(buf), 0);
             }
           }
         }

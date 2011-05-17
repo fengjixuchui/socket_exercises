@@ -9,6 +9,8 @@
 #include <netdb.h>
 #include <pthread.h>
 
+#include "sendall.h"
+
 #define BACKLOG 10
 
 int main(int argc, char **argv) {
@@ -47,7 +49,8 @@ int main(int argc, char **argv) {
           close(listenfd);
           while ((bytes = recv(connfd, buf, sizeof(buf), 0)))  {
               sleep(2);
-              send(connfd, buf, strlen(buf), 0);
+              buf[bytes] = 0;
+              sendall(connfd, buf, strlen(buf), 0);
           }
           close(connfd);
           exit(0);
