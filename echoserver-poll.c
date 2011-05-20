@@ -28,10 +28,8 @@ int main(int argc, char **argv) {
   char *listenport;
   int listenfd;
   int yes, err, sflags;
-  char buf[BUFLEN];
   struct pollfd pollfds[MAX_CONNECTIONS];
   int x, i; /* counters etc */
-  int bytes; /* number of bytes sent */
 
   listenport = argv[1];
 
@@ -64,10 +62,12 @@ int main(int argc, char **argv) {
       sizeof(int)))))
     die(gai_strerror(err));
 
-  /* set listen socket to be non blocking */
-  sflags = fcntl(listenfd, F_GETFL);
-  sflags |= O_NONBLOCK;
-  fcntl(listenfd, F_SETFL, sflags);
+  /* set sockets to be non blocking */
+  for (i = 0; i < MAX_CONNECTIONS; i++) {
+    sflags = fcntl(pollfds[i].fd, F_GETFL);
+    sflags |= O_NONBLOCK;
+    fcntl(pollfds[i].fd, F_SETFL, sflags);
+  }
 
   /* set the first poll socket to the listen socket. */
   pollfds[0].fd = listenfd;
@@ -98,9 +98,10 @@ int main(int argc, char **argv) {
               pollfds[i].revents = 0;
             }
             else if (pollfds[i].revents & POLLIN) { /* some data arrived, echo it */
-              while ((bytes = recv(pollfds[i].fd, buf, sizeof(buf), 0)) > 0)  {
-                buf[bytes] = 0;
-                sendall(pollfds[i].fd, buf, bytes, 0);
+              int numbytes = 0;
+              char buf[BUFLEN];
+              while ((numbytes = recv(pollfds[i].fd, buf, sizeof(buf), 0)) > 0)  {
+                sendall(pollfds[i].fd, buf, numbytes, 0);
               }
             }
           }
