@@ -98,9 +98,10 @@ int main(int argc, char **argv) {
               pollfds[i].revents = 0;
             }
             else if (pollfds[i].revents & POLLIN) { /* some data arrived, echo it */
-              bytes = recv(pollfds[i].fd, buf, sizeof(buf), 0);
-              buf[bytes] = 0;
-              sendall(pollfds[i].fd, buf, strlen(buf), 0);
+              while ((bytes = recv(pollfds[i].fd, buf, sizeof(buf), 0)) > 0)  {
+                buf[bytes] = 0;
+                sendall(pollfds[i].fd, buf, strlen(buf), 0);
+              }
             }
           }
         }
