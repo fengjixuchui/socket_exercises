@@ -10,7 +10,7 @@
 #include <poll.h>
 #include <fcntl.h>
 
-#include "sendall.h"
+#include "util.h"
 
 #define MAX_CONNECTIONS 20
 #define BUFLEN 1024
@@ -90,11 +90,7 @@ int main(int argc, char **argv) {
             }
           } else  { /* there is data to be read */
             if (pollfds[i].revents & POLLHUP) { /* lost connection */
-              /* reset the fd, remote it from array */
-              printf("hangup on socket %d pollfd[%d]\n",
-                  pollfds[i].fd, i);
-              close(pollfds[i].fd);
-              pollfds[i].fd = -1;
+              hangup(pollfds, i);
               pollfds[i].revents = 0;
             }
             else if (pollfds[i].revents & POLLIN) { /* some data arrived, echo it */
@@ -103,13 +99,8 @@ int main(int argc, char **argv) {
               while ((numbytes = recv(pollfds[i].fd, buf, sizeof(buf), 0)) > 0)  {
                 sendall(pollfds[i].fd, buf, numbytes, 0);
               }
-              if (numbytes == 0)  {
-                /* reset the fd, remote it from array */
-                printf("hangup on socket %d pollfd[%d]\n",
-                    pollfds[i].fd, i);
-                close(pollfds[i].fd);
-                pollfds[i].fd = -1;
-                pollfds[i].revents = 0;
+              if (numbytes == 0)  { /* Remote connection closed. */
+                hangup(pollfds, i);
               }
             }
           }
