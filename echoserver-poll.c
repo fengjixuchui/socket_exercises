@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
   int listenfd;
   int yes, err, sflags;
   struct pollfd pollfds[MAX_CONNECTIONS];
-  int x, i; /* counters etc */
+  int x, i;
 
   listenport = argv[1];
 
@@ -75,31 +75,40 @@ int main(int argc, char **argv) {
   while(1) {
     if (poll(pollfds, MAX_CONNECTIONS, -1)) {
       for (i = 0; i < MAX_CONNECTIONS; i++)  {
-        if (pollfds[i].revents)  { /* if an event happened */
-          if (i == 0) { /* If it is our listener socket */
+        /* if an event happened */
+        if (pollfds[i].revents)  {
+          /* if it is our listen socket */
+          if (i == 0) {
             int newfd;
+            /* accept the new connection and add it to the first available
+             * slot in our list of pollable sockets */
             newfd = accept(pollfds[0].fd, (struct sockaddr*)&their_addr,
                 &addr_size);
-            /* add the new fd to the list of pollable fds */
             for (x = 1; x < MAX_CONNECTIONS; x++)  {
-              if (pollfds[x].fd == -1) { /* the first available fd */
+              if (pollfds[x].fd == -1) {
                 pollfds[x].fd = newfd;
                 printf("new connection on socket %d pollfd[%d]\n", newfd, x);
                 break;
               }
             }
-          } else  { /* there is data to be read */
-            if (pollfds[i].revents & POLLHUP) { /* lost connection */
+          /* there is data to be read on a socket other than our listen
+           * socket */
+          } else {
+            /* close socket and remove if there was a explicit hangup */
+            if (pollfds[i].revents & POLLHUP) {
               hangup(pollfds, i);
               pollfds[i].revents = 0;
             }
-            else if (pollfds[i].revents & POLLIN) { /* some data arrived, echo it */
+            /* some readable data arrived. echo it. */
+            else if (pollfds[i].revents & POLLIN) {
               int numbytes = 0;
               char buf[BUFLEN];
-              while ((numbytes = recv(pollfds[i].fd, buf, sizeof(buf), 0)) > 0)  {
+              while ((numbytes = recv(pollfds[i].fd, buf, sizeof(buf), 0)) > 0) {
                 sendall(pollfds[i].fd, buf, numbytes, 0);
               }
-              if (numbytes == 0)  { /* Remote connection closed. */
+              /* zero bytes recv'd on a POLLIN event means that the remote
+               * connection was probably closed. Hang up in this situation. */
+              if (numbytes == 0)  {
                 hangup(pollfds, i);
               }
             }
