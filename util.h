@@ -7,4 +7,4 @@
 int sendall(int sfd, char *buf, int len, int flags);
 
 /* Close a socket in a poll array. */
-void hangup(struct pollfd *pollfds, int fdnum);
+void hangup(int *sfd);

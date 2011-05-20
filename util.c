@@ -15,14 +15,13 @@ int sendall(int sfd, char *buf, int len, int flags)  {
   return 0;
 }
 
-void hangup(struct pollfd *pollfds, int fdnum) {
+void hangup(int *sfd) {
 
-  printf("Connection on socket %d pollfd[%d] closed\n", pollfds[fdnum].fd,
-      fdnum);
+  printf("Connection closed on socket %d\n", *sfd);
 
   /* Close the socket. */
-  close(pollfds[fdnum].fd);
+  close(*sfd);
 
   /* "Remove" the socket from the poll array. */
-  pollfds[fdnum].fd = -1;
+  *sfd = -1;
 }

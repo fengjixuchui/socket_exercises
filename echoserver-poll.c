@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
             for (x = 1; x < MAX_CONNECTIONS; x++)  {
               if (pollfds[x].fd == -1) {
                 pollfds[x].fd = newfd;
-                printf("new connection on socket %d pollfd[%d]\n", newfd, x);
+                printf("New connection on socket %d\n", newfd);
                 break;
               }
             }
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
           } else {
             /* close socket and remove if there was a explicit hangup */
             if (pollfds[i].revents & POLLHUP) {
-              hangup(pollfds, i);
+              hangup(&pollfds[i].fd);
               pollfds[i].revents = 0;
             }
             /* some readable data arrived. echo it. */
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
               /* zero bytes recv'd on a POLLIN event means that the remote
                * connection was probably closed. Hang up in this situation. */
               if (numbytes == 0)  {
-                hangup(pollfds, i);
+                hangup(&pollfds[i].fd);
               }
             }
           }
