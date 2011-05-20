@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
             else if (pollfds[i].revents & POLLIN) { /* some data arrived, echo it */
               while ((bytes = recv(pollfds[i].fd, buf, sizeof(buf), 0)) > 0)  {
                 buf[bytes] = 0;
-                sendall(pollfds[i].fd, buf, strlen(buf), 0);
+                sendall(pollfds[i].fd, buf, bytes, 0);
               }
             }
           }
