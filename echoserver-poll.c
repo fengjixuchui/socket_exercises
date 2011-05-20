@@ -103,6 +103,14 @@ int main(int argc, char **argv) {
               while ((numbytes = recv(pollfds[i].fd, buf, sizeof(buf), 0)) > 0)  {
                 sendall(pollfds[i].fd, buf, numbytes, 0);
               }
+              if (numbytes == 0)  {
+                /* reset the fd, remote it from array */
+                printf("hangup on socket %d pollfd[%d]\n",
+                    pollfds[i].fd, i);
+                close(pollfds[i].fd);
+                pollfds[i].fd = -1;
+                pollfds[i].revents = 0;
+              }
             }
           }
         }
