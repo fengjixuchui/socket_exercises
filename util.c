@@ -37,8 +37,6 @@ int getlistenfd(char *port) {
 
   int lfd;
   struct addrinfo hints, *res;
-  struct sockaddr_storage their_addr;
-  socklen_t addr_size;
   int yes, err;
 
   bzero(&hints, sizeof(hints));
@@ -63,7 +61,7 @@ int getlistenfd(char *port) {
     die(gai_strerror(err));
   }
 
-  freeaddrinfo(&res);
+  freeaddrinfo(res);
   setnonblock(lfd);
 
   return lfd;
