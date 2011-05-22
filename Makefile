@@ -6,3 +6,4 @@ all:
 	$(CC) $(CFLAGS) echoserver-poll.c util.c -o echoserver-poll
 	$(CC) $(CFLAGS) echoserver-fork.c util.c -o echoserver-fork
 	$(CC) $(CFLAGS) echoserver-time.c util.c -o echoserver-time
+	$(CC) $(CFLAGS) echoserver-mt-poll.c util.c -o echoserver-mt-poll
