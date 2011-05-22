@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
 
   /* accept loop. Delegate accept'ed fds to a thread */
   for (;;)  {
-    if (poll(listenpollfd, 0, 0)) {
+    if (poll(listenpollfd, 0, -1)) {
       if (listenpollfd[0].revents & POLLIN) {
         int sfd = accept(listenfd, (struct sockaddr*)&their_addr,
             &addr_size);
@@ -102,6 +102,7 @@ void *thread_main (void *ptid)  {
           hangup(&pollfds[tid][i].fd);
         } else if (pollfds[tid][i].revents & POLLIN) {
           /* echo data */
+
         }
       }
     }
