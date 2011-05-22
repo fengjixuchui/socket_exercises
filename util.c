@@ -37,7 +37,7 @@ int getlistenfd(char *port) {
 
   int lfd;
   struct addrinfo hints, *res;
-  int yes, err;
+  int err;
 
   bzero(&hints, sizeof(hints));
   hints.ai_family = AF_UNSPEC;
